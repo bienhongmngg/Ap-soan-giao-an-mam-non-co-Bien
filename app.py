@@ -8,11 +8,16 @@ st.set_page_config(page_title="App Soạn Giáo Án Mầm Non", layout="wide")
 st.title("🏫 Trợ Lý Soạn Giáo Án Mầm Non Thông Minh")
 st.caption("Tự động hóa soạn giáo án chuẩn theo khung chương trình nhà trường")
 
-# Thanh cấu hình bên trái
+# Lấy API Key cố định từ Streamlit Secrets
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+    genai.configure(api_key=api_key)
+except Exception as e:
+    st.error("Chưa cấu hình GEMINI_API_KEY trong phần Streamlit Secrets! Vui lòng kiểm tra lại Cài đặt.")
+
+# Thanh bên trái chỉ còn phần Tải file tài liệu mẫu
 with st.sidebar:
-    st.header("⚙️ Cấu Hình")
-    api_key = st.text_input("Nhập Gemini API Key:", type="password")
-    st.markdown("---")
+    st.header("⚙️ Dữ Liệu Đầu Vào")
     st.write("📁 **Tài liệu nhà trường (Upload để AI học):**")
     uploaded_files = st.file_uploader(
         "Tải lên Kế hoạch năm, Quy định, Giáo án mẫu (.txt hoặc .docx)", 
@@ -32,12 +37,9 @@ yeu_cau_them = st.text_area("Yêu cầu bổ sung:", "Tích hợp trò chơi gâ
 
 # Xử lý tạo giáo án
 if st.button("🚀 Soạn Giáo Án Ngay", type="primary"):
-    if not api_key:
-        st.error("Vui lòng nhập API Key ở thanh cấu hình bên trái!")
-    elif not ten_bai:
+    if not ten_bai:
         st.warning("Vui lòng nhập tên hoạt động!")
     else:
-        genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
 
         context_data = ""
